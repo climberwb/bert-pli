@@ -2,6 +2,7 @@ import os
 import csv
 import argparse
 import random
+import json
 random.seed(42)
 
 #
@@ -28,7 +29,7 @@ list_dir = [x for x in os.walk(args.train_dir)]
 #
 # Write train.tsv file with query_text \t doc_relevant_text \t doc_irrelevant_text for all subdirectories
 #
-
+entailment_gtruth_dict = json.load(open(os.path.join(args.train_dir,'task2_train_labels_2021.json') ,"rb"))
 with open(os.path.join(args.output_dir, 'train_all.tsv'), 'wt') as out_file:
     tsv_writer = csv.writer(out_file, delimiter='\t')
 
@@ -40,12 +41,13 @@ with open(os.path.join(args.output_dir, 'train_all.tsv'), 'wt') as out_file:
             query_text_lines = entailed_fragment.read().splitlines()
             query_text = ' '.join([text.strip().replace('\n', '') for text in query_text_lines])
         # read in relevant document ids
-        with open(os.path.join(args.train_dir, sub_dir, 'entailing_paragraphs.txt'), 'r') as entailing_paragraphs:
-            doc_rel_id = entailing_paragraphs.read().splitlines()
+#         with open(os.path.join(args.train_dir, sub_dir, 'entailing_paragraphs.txt'), 'r') as entailing_paragraphs:
+            doc_rel_id = entailment_gtruth_dict.keys()
 
         # read in all paragraphs with their names and then choose the relevant ones and sample irrelevant ones!
         list_sub_dir_paragraphs = [x for x in os.walk(os.path.join(args.train_dir, sub_dir, 'paragraphs'))]
         paragraphs_text = {}
+        
         for paragraph in list_sub_dir_paragraphs[0][2]:
             with open(os.path.join(args.train_dir, sub_dir, 'paragraphs', paragraph), 'r') as paragraph_file:
                 para_text = paragraph_file.read().splitlines()[1:]
