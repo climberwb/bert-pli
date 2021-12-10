@@ -1,8 +1,9 @@
 import os
 import csv
 import argparse
-import json
+import xml.etree.ElementTree as ET
 import random
+import json
 random.seed(42)
 
 #
@@ -37,8 +38,11 @@ list_dir_train = [x for x in os.walk(args.train_dir)]
 # load gold labels as dictionary
 #
 
-gold_labels = json.load(open(args.test_gold_labels,"rb+"))
+gold_labels = json.loads(open(args.test_gold_labels,"rb+"))
 
+#
+# Write test_train_format.tsv file with query_text \t doc_relevant_text \t doc_irrelevant_text for all subdirectories
+#
 
 with open(os.path.join(args.output_dir, 'test_train_merged.tsv'), 'wt') as out_file:
     tsv_writer = csv.writer(out_file, delimiter='\t')
@@ -53,9 +57,6 @@ with open(os.path.join(args.output_dir, 'test_train_merged.tsv'), 'wt') as out_f
 
         # read in all paragraphs with their names and then choose the relevant ones and sample irrelevant ones!
         list_sub_dir_paragraphs = [x for x in os.walk(os.path.join(args.train_dir, sub_dir, 'paragraphs'))]
-        if len(list_sub_dir_paragraphs)==0:
-            continue
-        print(list_sub_dir_paragraphs,sub_dir,sub_dir,args.train_dir)
         paragraphs_text = {}
         for paragraph in list_sub_dir_paragraphs[0][2]:
             with open(os.path.join(args.train_dir, sub_dir, 'paragraphs', paragraph), 'r') as paragraph_file:
@@ -81,13 +82,13 @@ with open(os.path.join(args.output_dir, 'test_train_merged.tsv'), 'wt') as out_f
             query_text_lines = entailed_fragment.read().splitlines()
             query_text = ' '.join([text.strip().replace('\n', '') for text in query_text_lines])
         # read in relevant document ids
-        with open(os.path.join(args.train_dir, sub_dir, 'entailing_paragraphs.txt'), 'r') as entailing_paragraphs:
-            doc_rel_id = entailing_paragraphs.read().splitlines()
+        with open(os.path.join(args.train_dir, sub_dir, 'task2_train_labels_2021.json'), 'r') as entailing_paragraphs:
+            doc_rel_id = json.load(entailing_paragraphs)
+
 
         # read in all paragraphs with their names and then choose the relevant ones and sample irrelevant ones!
         list_sub_dir_paragraphs = [x for x in os.walk(os.path.join(args.train_dir, sub_dir, 'paragraphs'))]
         paragraphs_text = {}
-        
         for paragraph in list_sub_dir_paragraphs[0][2]:
             with open(os.path.join(args.train_dir, sub_dir, 'paragraphs', paragraph), 'r') as paragraph_file:
                 para_text = paragraph_file.read().splitlines()[1:]
