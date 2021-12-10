@@ -1,7 +1,7 @@
 import os
 import csv
 import argparse
-import xml.etree.ElementTree as ET
+import json
 import random
 random.seed(42)
 
@@ -37,18 +37,8 @@ list_dir_train = [x for x in os.walk(args.train_dir)]
 # load gold labels as dictionary
 #
 
-tree = ET.parse(args.test_gold_labels)
-root = tree.getroot()
+gold_labels = json.load(open(args.test_gold_labels,"rb+"))
 
-gold_labels = {}
-for child in root:
-    rank = child.find('entailing_paragraphs').text
-    rank = rank.split(',')
-    gold_labels.update({child.attrib['id']: rank})
-
-#
-# Write test_train_format.tsv file with query_text \t doc_relevant_text \t doc_irrelevant_text for all subdirectories
-#
 
 with open(os.path.join(args.output_dir, 'test_train_merged.tsv'), 'wt') as out_file:
     tsv_writer = csv.writer(out_file, delimiter='\t')
@@ -63,6 +53,9 @@ with open(os.path.join(args.output_dir, 'test_train_merged.tsv'), 'wt') as out_f
 
         # read in all paragraphs with their names and then choose the relevant ones and sample irrelevant ones!
         list_sub_dir_paragraphs = [x for x in os.walk(os.path.join(args.train_dir, sub_dir, 'paragraphs'))]
+        if len(list_sub_dir_paragraphs)==0:
+            continue
+        print(list_sub_dir_paragraphs,sub_dir,sub_dir,args.train_dir)
         paragraphs_text = {}
         for paragraph in list_sub_dir_paragraphs[0][2]:
             with open(os.path.join(args.train_dir, sub_dir, 'paragraphs', paragraph), 'r') as paragraph_file:
@@ -94,6 +87,7 @@ with open(os.path.join(args.output_dir, 'test_train_merged.tsv'), 'wt') as out_f
         # read in all paragraphs with their names and then choose the relevant ones and sample irrelevant ones!
         list_sub_dir_paragraphs = [x for x in os.walk(os.path.join(args.train_dir, sub_dir, 'paragraphs'))]
         paragraphs_text = {}
+        
         for paragraph in list_sub_dir_paragraphs[0][2]:
             with open(os.path.join(args.train_dir, sub_dir, 'paragraphs', paragraph), 'r') as paragraph_file:
                 para_text = paragraph_file.read().splitlines()[1:]
