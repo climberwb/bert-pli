@@ -42,7 +42,7 @@ with open(os.path.join(args.output_dir, 'train_all.tsv'), 'wt') as out_file:
             query_text = ' '.join([text.strip().replace('\n', '') for text in query_text_lines])
         # read in relevant document ids
 #         with open(os.path.join(args.train_dir, sub_dir, 'entailing_paragraphs.txt'), 'r') as entailing_paragraphs:
-            doc_rel_id = entailment_gtruth_dict.keys()
+            doc_rel_id = entailment_gtruth_dict[sub_dir]
 
         # read in all paragraphs with their names and then choose the relevant ones and sample irrelevant ones!
         list_sub_dir_paragraphs = [x for x in os.walk(os.path.join(args.train_dir, sub_dir, 'paragraphs'))]
@@ -56,14 +56,14 @@ with open(os.path.join(args.output_dir, 'train_all.tsv'), 'wt') as out_file:
         for rel_id in doc_rel_id:
             doc_rel_text = paragraphs_text.get(rel_id)
             samples.append([1, sub_dir, rel_id, query_text, doc_rel_text])
-
+       
         # all irrelevant documents
         doc_irrel_id = [irrel_id for irrel_id in paragraphs_text.keys() if irrel_id not in doc_rel_id]
 
         for irrel_id in doc_irrel_id:
             doc_irrel_text = paragraphs_text.get(irrel_id)
             samples.append([0, sub_dir, irrel_id, query_text, doc_irrel_text])
-
+    
     # important: shuffle the train data
     random.shuffle(samples)
 
