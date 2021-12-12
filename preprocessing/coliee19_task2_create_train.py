@@ -51,10 +51,14 @@ with open(os.path.join(args.output_dir, 'train_all.tsv'), 'wt') as out_file:
         for paragraph in list_sub_dir_paragraphs[0][2]:
             with open(os.path.join(args.train_dir, sub_dir, 'paragraphs', paragraph), 'r') as paragraph_file:
                 para_text = paragraph_file.read().splitlines()[1:]
-                paragraphs_text.update({paragraph.split('.')[0]: ' '.join([text.strip().replace('\n', '') for text in para_text])})
-
+                paragraphs_text.update({paragraph: ' '.join([text.strip().replace('\n', '') for text in para_text])})
+#                 print(paragraph.split('.')[0],doc_rel_id)
+#                 if paragraph.split('.')[0] in doc_rel_id:
+#                     print("INNNN",para_text)
+        print(paragraphs_text.keys())
         for rel_id in doc_rel_id:
             doc_rel_text = paragraphs_text.get(rel_id)
+          
             samples.append([1, sub_dir, rel_id, query_text, doc_rel_text])
        
         # all irrelevant documents
