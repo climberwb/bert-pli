@@ -79,8 +79,8 @@ def example_item_to_feature(example, max_seq_length,
     if mode == 'test':
         res_dict = {
             'input_ids': input_ids,
-            'input_mask': input_mask,
-            'segment_ids': segment_ids,
+            'attention_mask': input_mask,
+            'token_type_ids': segment_ids,
         }
         return res_dict
 
@@ -91,8 +91,8 @@ def example_item_to_feature(example, max_seq_length,
 
     res_dict = {
         'input_ids': input_ids,
-        'input_mask': input_mask,
-        'segment_ids': segment_ids,
+        'attention_mask': input_mask,
+        'token_type_ids': segment_ids,
         'label_id': label_id,
     }
 
